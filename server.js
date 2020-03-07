@@ -21,12 +21,15 @@ function start() {
             type: "list", 
             name: "action", 
             message: "What would you like to do?",
-            choices: ["Add ...", "Exit"]
+            choices: ["Add ...", "View ...","Exit"]
         }
     ]).then(answer => {
         switch(answer.action) {
             case "Add ...":
                 add();
+                break;
+            case "View ...":
+                view();
                 break;
             case "Exit":
                 console.log("Goodbye")
@@ -68,8 +71,6 @@ async function addDept() {
         }
     ]);
 
-    console.log(name)
-
     connection.query("INSERT INTO department SET ?", 
     {
         name: name
@@ -86,5 +87,23 @@ async function addRole() {
 }
 
 async function addEmp() {
+    start();
+}
+
+async function view() {
+    const { table } = await inquirer.prompt([
+        {
+            type: "list", 
+            name: "table", 
+            message: "What would you like to view?",
+            choices: ["Department", "Role", "Employee"]
+        }
+    ])
+    
+    connection.query(`SELECT * FROM ${table}`, function(err, res) {
+        if (err) throw err;
+        console.table(res);
+    })
+
     start();
 }
