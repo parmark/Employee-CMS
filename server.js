@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var cTable = require("console.table");
 
 var connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -125,17 +126,95 @@ function getDepartmentID(department) {
     })
 }
 
-function getDepartments() {
+function getDepartments() { 
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM department", function(err, res) {
             if (err) throw err;
+            console.log(res)
             resolve(res);
         })
     })
 }
 
 async function addEmp() {
-    start();
+    const { firstName, lastName, role, manager } = await inquirer.prompt([
+        {
+            type: "input", 
+            name: "firstName", 
+            message: "What is this employee's first name?",
+        },
+        {
+            type: "input", 
+            name: "lastName", 
+            message: "What is this employee's last name?",
+        }, 
+        {
+            type: "list", 
+            name: "role", 
+            message: "What is this employee's role?",
+            choices: getRoles
+        },
+        {
+            type: "list", 
+            name: "manager", 
+            message: "Who is this employee's manager?",
+            choices: getManagers
+        }
+    ]);
+
+    connection.query("INSERT INTO employee SET ?", 
+    {
+        first_name: firstName,
+        last_name: lastName,
+        role_id: await getRoleID(role),
+        manager_id: await getManagerID(manager)
+    },
+    function(err) {
+        if (err) throw err;
+        console.log("New employee added!");
+        start();
+    });
+}
+
+function getRoleID(role) {
+    return new Promise(function(resolve, reject) {
+        connection.query(`SELECT id FROM role WHERE title = "${role}"`, function(err, res) {
+            if (err) throw err;
+            resolve(res[0].id);
+        })
+    })
+}
+
+function getManagerID(manager) {
+    if (manager !== "None") {
+        names = manager.split(" ")
+        return new Promise(function(resolve, reject) {
+            connection.query(`SELECT id FROM employee WHERE first_name = "${names[0]}" AND last_name = "${names[1]}"`, function(err, res) {
+                if (err) throw err;
+                resolve(res[0].id);
+            })
+        })
+    }
+}
+
+function getRoles() {
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM role", function(err, res) {
+            if (err) throw err;
+            resolve(res.map(element => element.title));
+        })
+    })
+}
+
+function getManagers() {
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM employee", function(err, res) {
+            if (err) throw err;
+            res = res.map(element => String(element.first_name) + " " + String(element.last_name))
+            res.push("None")
+            resolve(res);
+        })
+    })
 }
 
 async function view() {
@@ -151,7 +230,6 @@ async function view() {
     connection.query(`SELECT * FROM ${table}`, function(err, res) {
         if (err) throw err;
         console.table(res);
+        start();
     })
-
-    start();
 }
