@@ -83,7 +83,55 @@ async function addDept() {
 }
 
 async function addRole() {
-    start();
+    const { title, salary, department } = await inquirer.prompt([
+        {
+            type: "input", 
+            name: "title", 
+            message: "What is title of the new role?",
+        },
+        {
+            type: "input", 
+            name: "salary", 
+            message: "What is salary of the new role?",
+        }, 
+        {
+            type: "list", 
+            name: "department", 
+            message: "Which department does this role belong to?",
+            choices: getDepartments
+        }
+    ]);
+
+    connection.query("INSERT INTO role SET ?", 
+    {
+        title: title,
+        salary: salary,
+        department_id: await getDepartmentID(department)
+    },
+    function(err) {
+        if (err) throw err;
+        console.log("New role added!")
+        start();
+    })
+}
+
+function getDepartmentID(department) {
+    return new Promise(function(resolve, reject) {
+        connection.query(`SELECT id FROM department WHERE name = "${department}"`, function(err, res) {
+            if (err) throw err;
+            console.log(res[0].id)
+            resolve(res[0].id);
+        })
+    })
+}
+
+function getDepartments() {
+    return new Promise(function (resolve, reject) {
+        connection.query("SELECT * FROM department", function(err, res) {
+            if (err) throw err;
+            resolve(res);
+        })
+    })
 }
 
 async function addEmp() {
