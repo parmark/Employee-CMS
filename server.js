@@ -22,7 +22,7 @@ function start() {
             type: "list", 
             name: "action", 
             message: "What would you like to do?",
-            choices: ["Add ...", "View ...","Exit"]
+            choices: ["Add ...", "View ...", "Update ...", "Exit"]
         }
     ]).then(answer => {
         switch(answer.action) {
@@ -31,6 +31,9 @@ function start() {
                 break;
             case "View ...":
                 view();
+                break;
+            case "Update ...":
+                update();
                 break;
             case "Exit":
                 console.log("Goodbye")
@@ -136,7 +139,7 @@ function getDepartments() {
     })
 }
 
-async function addEmp() {
+async function addEmp() { 
     const { firstName, lastName, role, manager } = await inquirer.prompt([
         {
             type: "input", 
@@ -216,6 +219,54 @@ function getManagers() {
         })
     })
 }
+
+async function update() {
+    const { action } = await inquirer.prompt([
+        {
+            type: "list", 
+            name: "action", 
+            message: "What would you like to update?",
+            choices: ["An employee's role", "An employee's manager"]
+        }
+    ])
+
+    switch(action) {
+        case "An employee's role": 
+            setEmpRole();
+            break;
+        case "An employee's manager":
+            setEmpManager();
+            break;
+    }
+}
+
+async function setEmpRole() {
+    const { employee, role } = await inquirer.prompt([
+        {
+            type: "list", 
+            name: "employee", 
+            message: "Whose role would you like to update?",
+            choices: getManagers
+        }, 
+        {
+            type: "list", 
+            name: "role", 
+            message: "What is their new role?",
+            choices: getRoles
+        }
+    ])
+
+    const names = employee.split(" ")
+
+    connection.query(`UPDATE employee SET role_id = "${await getRoleID(role)}" WHERE first_name = "${names[0]}" AND last_name = "${names[1]}"`, function(err, res) {
+        if (err) throw err;
+        console.log("Role updated!")
+        start()
+    })
+
+}
+
+
 
 async function view() {
     const { table } = await inquirer.prompt([
