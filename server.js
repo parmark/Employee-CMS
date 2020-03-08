@@ -161,7 +161,7 @@ async function addEmp() {
             type: "list", 
             name: "manager", 
             message: "Who is this employee's manager?",
-            choices: getManagers
+            choices: getEmployees
         }
     ]);
 
@@ -209,7 +209,7 @@ function getRoles() {
     })
 }
 
-function getManagers() {
+function getEmployees() {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM employee", function(err, res) {
             if (err) throw err;
@@ -246,7 +246,7 @@ async function setEmpRole() {
             type: "list", 
             name: "employee", 
             message: "Whose role would you like to update?",
-            choices: getManagers
+            choices: getEmployees
         }, 
         {
             type: "list", 
