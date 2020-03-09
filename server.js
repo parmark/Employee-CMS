@@ -200,6 +200,18 @@ function getManagerID(manager) {
     }
 }
 
+function getManagerName(manager) {
+    if (manager !== "None") {
+        names = manager.split(" ")
+        return new Promise(function(resolve, reject) {
+            connection.query(`SELECT first_name, last_name FROM employee WHERE first_name = "${names[0]}" AND last_name = "${names[1]}"`, function(err, res) {
+                if (err) throw err;
+                resolve(res[0].id);
+            })
+        })
+    }
+}
+
 function getRoles() {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM role", function(err, res) {
@@ -266,21 +278,34 @@ async function setEmpRole() {
 
 }
 
-
-
 async function view() {
     const { table } = await inquirer.prompt([
         {
             type: "list", 
             name: "table", 
             message: "What would you like to view?",
-            choices: ["Department", "Role", "Employee"]
+            choices: ["Department", "Role", "Employee", "All"]
         }
     ])
     
-    connection.query(`SELECT * FROM ${table}`, function(err, res) {
-        if (err) throw err;
-        console.table(res);
-        start();
-    })
+    if (table === "All") {
+        const selection = `SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name FROM role 
+        JOIN employee ON role.id = employee.role_id
+        JOIN department ON role.department_id = department.id`
+        connection.query(selection, function(err, res) {
+            if (err) throw err;
+    
+            console.table(res);
+            start();
+        })
+    }
+    else {
+        const selection = `SELECT * FROM ${table}` 
+        connection.query(selection, function(err, res) {
+            if (err) throw err;
+    
+            console.table(res);
+            start();
+        })
+    }
 }
