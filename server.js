@@ -235,7 +235,7 @@ async function update() {
             type: "list", 
             name: "action", 
             message: "What would you like to update?",
-            choices: ["An employee's role", "An employee's manager"]
+            choices: ["An employee's role"]
         }
     ])
 
@@ -243,9 +243,9 @@ async function update() {
         case "An employee's role": 
             setEmpRole();
             break;
-        case "An employee's manager":
-            setEmpManager();
-            break;
+        // case "An employee's manager":
+        //     setEmpManager();
+        //     break;
     }
 }
 
