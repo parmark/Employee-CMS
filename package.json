@@ -1,0 +1,25 @@
+{
+  "name": "employee-cms",
+  "version": "1.0.0",
+  "description": "This is a content management system that can keep track of employees of various salaries, roles, and departments.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parmark/Employee-CMS.git"
+  },
+  "author": "Kevin Parmar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/parmark/Employee-CMS/issues"
+  },
+  "homepage": "https://github.com/parmark/Employee-CMS#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.0.6",
+    "mysql": "^2.18.1"
+  }
+}
