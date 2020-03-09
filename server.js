@@ -12,7 +12,6 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id" + connection.threadId);
     start();
 })
 
@@ -123,7 +122,6 @@ function getDepartmentID(department) {
     return new Promise(function(resolve, reject) {
         connection.query(`SELECT id FROM department WHERE name = "${department}"`, function(err, res) {
             if (err) throw err;
-            console.log(res[0].id)
             resolve(res[0].id);
         })
     })
@@ -133,7 +131,6 @@ function getDepartments() {
     return new Promise(function (resolve, reject) {
         connection.query("SELECT * FROM department", function(err, res) {
             if (err) throw err;
-            console.log(res)
             resolve(res);
         })
     })
